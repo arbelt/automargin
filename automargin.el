@@ -56,7 +56,7 @@
 (define-minor-mode automargin-mode
   "automatically add margins to windows"
   :init-value nil
-  :global t
+  :global nil
   (if automargin-mode
       (add-hook 'window-configuration-change-hook 'automargin-function)
     (remove-hook 'window-configuration-change-hook 'automargin-function)))

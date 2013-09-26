@@ -57,9 +57,11 @@
   "automatically add margins to windows"
   :init-value nil
   :global nil
-  (if automargin-mode
-      (add-hook 'window-configuration-change-hook 'automargin-function)
-    (remove-hook 'window-configuration-change-hook 'automargin-function)))
+  (progn
+    (if automargin-mode
+       (add-hook 'window-configuration-change-hook 'automargin-function)
+      (remove-hook 'window-configuration-change-hook 'automargin-function))
+    (switch-to-buffer (current-buffer))))
 
 (defun automargin--window-width (&optional window)
   (let ((margins (window-margins window))
@@ -69,14 +71,15 @@
        (or (cdr margins) 0))))
 
 (defun automargin-function ()
-  (let* ((automargin-margin
-          (/ (- (frame-width) automargin-target-width) 2))
-         (automargin-margin
-          (if (< automargin-margin 0) 0 automargin-margin)))
-    (dolist (window (window-list))
-      (let ((margin (if (= (frame-width) (automargin--window-width window))
-                        automargin-margin 0)))
-        (set-window-margins window margin margin)))))
+  (when automargin-mode
+    (let* ((automargin-margin
+	    (/ (- (frame-width) automargin-target-width) 2))
+	   (automargin-margin
+	    (if (< automargin-margin 0) 0 automargin-margin)))
+      (let (window (get-buffer-window))
+	(let ((margin (if (= (frame-width) (automargin--window-width window))
+			  automargin-margin 0)))
+	  (set-window-margins window margin margin))))))
 
 ;; * provide
 
